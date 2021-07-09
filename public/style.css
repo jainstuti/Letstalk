@@ -1,0 +1,39 @@
+#handle::placeholder, #message::placeholder{
+    color: rgb(114, 108, 108);
+}
+
+#text_area{
+    width: 70%;
+    margin: auto;
+}
+
+#recorded{
+    width: 450px;
+    height: 400px;
+}
+
+#right{
+    text-align: right;
+    background: hsl(120, 64%, 79%);
+}
+
+.header{
+    text-align: center;
+}
+
+#chat-window{
+    background-color: rgb(248, 247, 247);
+    height: 200px;
+    overflow-y: auto;
+}
+
+#lVideo{
+    width: 400px;
+    height: 400px;
+}
+
+canvas{
+    width: 400px;
+    height: 400px;
+
+}
