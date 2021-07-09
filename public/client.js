@@ -390,9 +390,9 @@ blurBtn.addEventListener('click', e => {
         if(sender) {
             // sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
             sender.replaceTrack(videoTrack)
-            videoTrack.onended=function(){
-              sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-            }
+            // videoTrack.onended=function(){
+            //   sender.replaceTrack(window.localstream.getVideoTracks()[0]);
+            // }
         }
         //dddddddddddddddd
         // sender.replaceTrack(window.localstream[0], blurbgStream, window.localstream);
@@ -448,6 +448,21 @@ blurBtn.addEventListener('click', e => {
   
     lVideo.hidden = false;
     canvas.hidden = true;
+    let videoTrack=window.localstream.getVideoTracks()[0];
+    var sender=currentPeer.getSenders().find(function(s){
+      // console.log(s);
+      // console.log(blurbgStream);
+      if(s.track.kind==videoTrack.kind)
+          console.log("match found");
+      return s.track.kind==videoTrack.kind;
+    })
+    if(sender) {
+      // sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
+      sender.replaceTrack(videoTrack)
+      // videoTrack.onended=function(){
+      //   sender.replaceTrack(window.localstream.getVideoTracks()[0]);
+      // }
+    }
   });
 
   function loadBodyPix() {
