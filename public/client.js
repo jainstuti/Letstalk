@@ -1,6 +1,3 @@
-// const Peer = require("peerjs");
-// import Peer from 'peerjs';
-
 const socket=io();
 
 const message=document.getElementById('message');
@@ -58,7 +55,6 @@ const muteCameraButton=document.getElementById('muteCamera');
 const muteAudioButton=document.getElementById('muteAudio')
 const shareScreenButton=document.getElementById('shareScreen')
 const recordButton = document.getElementById("recordScreen");
-// const errorMsgElement = document.querySelector('span#errorMsg');
 const blurBtn = document.getElementById('blur-btn');
 const unblurBtn = document.getElementById('unblur-btn');
 const canvas = document.getElementById('canvas');
@@ -68,7 +64,6 @@ const recordedVideo = document.querySelector('video#recorded');
 const playButton = document.querySelector('button#play');
 const downloadButton = document.querySelector('button#download');
 const getScreenStream=document.getElementById('getScreenStream');
-// tf.setBackend('cpu')
 let mediaRecorder;
 let recordedBlobs;
 //--------------------video call feature----------------------
@@ -90,34 +85,6 @@ navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
     alert("cannot access your camera");
     console.log(err);
 });
-// function getVideo(callbacks){
-//     navigator.mediaDevices.getUserMedia = navigator.mediaDevices.getUserMedia || 
-//                        navigator.mediaDevices.webkitGetUserMedia || navigator.mediaDevices.mozGetUserMedia;
-//     var constraints={
-//         audio: true,
-//         video: true
-//     }
-
-//     navigator.mediaDevices.getUserMedia(constraints, callbacks.success, callbacks.error)
-// }
-
-// function receiveStream(stream, elemid){
-//     var video=document.getElementById(elemid);
-//     video.srcObject=stream;
-//     window.peer_stream=stream; //global reference for our stream to be rendered on other person's end
-// }
-
-// getVideo({
-//     success: function(stream){
-//         window.localstream=stream;
-//         receiveStream(stream, lVideo);
-//     },
-//     error: function(err){
-//         alert("cannot access your camera");
-//         console.log(err);
-//     }
-// })
-
 
 var conn;
 var peer_id;
@@ -155,7 +122,6 @@ connectButton.addEventListener('click', function(){
 })
 
 //accept call
-
 peer.on('call', function(call){
     var acceptCall = true;
 
@@ -170,9 +136,6 @@ peer.on('call', function(call){
             window.peer_stream=stream;
             rVideo.srcObject=stream;
         });
-
-        // call.on('close', function(){
-        // })
     }
     else{
         console.log("call denied");
@@ -184,7 +147,6 @@ peer.on('destroyed', ()=>{
 })
 
 //initiate call
-
 callButton.addEventListener('click', function(){
     console.log("calling peer: "+peer_id);
     console.log(peer);
@@ -207,7 +169,9 @@ endCallButton.addEventListener('click', function (){
 muteCameraButton.addEventListener('click', ()=>{
     var vidTrack = window.localstream.getVideoTracks();
     vidTrack.forEach(track => track.enabled = !track.enabled);
-    muteCameraButton.innerHTML=muteCameraButton.innerHTML===('<i class="fas fa-video-slash" aria-hidden="true"></i>' || '<i class="fas fa-video-slash"></i>')? '<i class="fas fa-video" aria-hidden="true"></i>' : '<i class="fas fa-video-slash" aria-hidden="true"></i>';
+    muteCameraButton.innerHTML=muteCameraButton.innerHTML===('<i class="fas fa-video-slash" aria-hidden="true"></i>' 
+    || '<i class="fas fa-video-slash"></i>')?
+     '<i class="fas fa-video" aria-hidden="true"></i>' : '<i class="fas fa-video-slash" aria-hidden="true"></i>';
 
     unblurBtn.disabled = !unblurBtn.disabled;
     blurBtn.disabled = !blurBtn.disabled;
@@ -221,132 +185,55 @@ muteCameraButton.addEventListener('click', ()=>{
 //mute mic
 muteAudioButton.addEventListener('click', function muteMic() {
     window.localstream.getAudioTracks().forEach(track => track.enabled = !track.enabled);
-    muteAudioButton.innerHTML=muteAudioButton.innerHTML===('<i class="fas fa-microphone-slash" aria-hidden="true"></i>' || '<i class="fas fa-microphone-slash"></i>')? '<i class="fas fa-microphone" aria-hidden="true"></i>' : '<i class="fas fa-microphone-slash" aria-hidden="true"></i>';
+    muteAudioButton.innerHTML=muteAudioButton.innerHTML===('<i class="fas fa-microphone-slash" aria-hidden="true"></i>' ||
+    '<i class="fas fa-microphone-slash"></i>')? 
+    '<i class="fas fa-microphone" aria-hidden="true"></i>' : '<i class="fas fa-microphone-slash" aria-hidden="true"></i>';
   })
 
-  //share screen
-
-//   async function getScreenshareWithMicrophone() {
-//     const tempstream = await navigator.mediaDevices.getDisplayMedia({video: "window"});
-//     // const audio = await navigator.mediaDevices.getUserMedia({audio: true});
-//     return tempstream;
-//     // return new MediaStream([tempstream.getTracks()[0] ]);  
-//   }
-
-
-//   document.getElementById('shareScreen').addEventListener('click', ()=>{    
-//     var camVideoTrack = window.localstream.getVideoTracks()[0];
-//     var camAudioTrack = window.localstream.getAudioTracks()[0];
-//     var videoSender = conn.addTrack(camVideoTrack, window.localstream );
-//     var audioSender = conn.addTrack(camAudioTrack, window.localstream );
-
-//     const screenStream = navigator.mediaDevices.getDisplayMedia({video: "window"});
-//     var screenVideoTrack = screenStream.getVideoTracks()[0];
-//     videoSender.replaceTrack(screenVideoTrack);
-//     screenVideoTrack.onended=function(){
-//         videoSender.replaceTrack(camStream.getVideoTracks()[0]);
-//   }
-// })
-
-  document.getElementById("shareScreen").addEventListener('click', (e)=>{
-      navigator.mediaDevices.getDisplayMedia({
-          video:{
-              cursor: "always",
-              height: 580,
-              width: 740
+//share screen
+document.getElementById("shareScreen").addEventListener('click', (e)=>{
+    navigator.mediaDevices.getDisplayMedia({
+        video:{
+            cursor: "always",
+            height: 580,
+            width: 740
 
 
-          },
-          audio:{
-              echoCancellation: true,
-              noiseSuppression: true
+        },
+        audio:{
+            echoCancellation: true,
+            noiseSuppression: true
+        }
+    }).then((stream)=>{
+          let videoTrack=stream.getVideoTracks()[0];
+          if(!currentPeer) {
+              console.log("NO current peer found!");
           }
-      }).then((stream)=>{
-            let videoTrack=stream.getVideoTracks()[0];
-            if(!currentPeer) {
-                console.log("NO current peer found!");
-            }
-            // else {
-            // }
+          // else {
+          // }
 
-            console.log("currentPeer.getSenders() is ");
-            console.log(currentPeer.getSenders());
-            var sender=currentPeer.getSenders().find(function(s){
-                console.log(s);
-                console.log(videoTrack);
-                if(s.track.kind==videoTrack.kind)
-                    console.log("match found");
-                return s.track.kind==videoTrack.kind;
-            })
-            if(sender) {
-                sender.replaceTrack(videoTrack);
-                videoTrack.onended=function(){
-                        sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-                }
-            }
-            else {
-                console.log("sender is undefined or null or something unreasonable");
-            }
-      }).catch((err)=>{
-          console.error("unable to get display " + err);
-      })
-  })
-  //.......
-//  shareScreenButton.addEventListener('click', async ()=>{
-//         var track = await navigator.mediaDevices.getDisplayMedia({video: "window"});
-//         track=track.getVideoTracks()[0];
-
-//     rtpSender = peer.addTrack(track, window.localstream);
-    // track.onended=function(){
-    //     stopSharing();
-    // }
-//  })
-
-//  function stopSharing(){
-//      let videoTrack = window.localstream.getVideoTracks()[0];
-//      conn.replaceTrack(videoTrack);
-//  }
-//  document.getElementById('sharedScreen').srcObject=rtcRtpReceiver.track
-//.........
-
-//  conn.ontrack = function (event) {
-//     //  document.getElementById('sharedScreen').srcObject=track;
-//     // window.peer_stream.addTrack(event.track);
-//     document.getElementById('sharedScreen').srcObject=event.streams[0];
-
-//   };
-
-// function sendBlur(){
-//   var blurbgStream = canvas.captureStream(25);
-//         // document.getElementById('blur').srcObject=blurbgStream;
-//         if(!blurbgStream){
-//           console.log("stream null");
-//         }
-//         console.log("currentPeer "+currentPeer);
-//         console.log("canvas stream "+blurbgStream);
-  
-//         var sender=currentPeer.getSenders().find(function(s){
-//           console.log(s);
-//           console.log(blurbgStream);
-//           if(s.track.kind=="video")
-//               console.log("match found");
-//           return true;
-//         })
-//         if(sender) {
-//             sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
-//             blurbgStream.onended=function(){
-//               sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-//             }
-//         }
-//         //dddddddddddddddd
-//         // sender.replaceTrack(window.localstream[0], blurbgStream, window.localstream);
-//         console.log("After loadbodypix()");
-//       }
-//       catch(err){
-//         console.log("BODYPIX...");
-  
-//         console.log(err.message);
-// }
+          console.log("currentPeer.getSenders() is ");
+          console.log(currentPeer.getSenders());
+          var sender=currentPeer.getSenders().find(function(s){
+              console.log(s);
+              console.log(videoTrack);
+              if(s.track.kind==videoTrack.kind)
+                  console.log("match found");
+              return s.track.kind==videoTrack.kind;
+          })
+          if(sender) {
+              sender.replaceTrack(videoTrack);
+              videoTrack.onended=function(){
+                      sender.replaceTrack(window.localstream.getVideoTracks()[0]);
+              }
+          }
+          else {
+              console.log("sender is undefined or null or something unreasonable");
+          }
+    }).catch((err)=>{
+        console.error("unable to get display " + err);
+    })
+})
 
 //blur background
 blurBtn.addEventListener('click', e => {
@@ -357,199 +244,91 @@ blurBtn.addEventListener('click', e => {
     lVideo.hidden = true;
     canvas.hidden = false;
     
-  
-    // try {
-      console.log("Before loadbodypix()");
-      // loadBodyPix(videoElement);
-    //   if(!loadBodyPix()){
-    //       console.log("nota ble to load bodypix  ");
-    //   }
-      loadBodyPix();
-      // setTimeout(()=>{
-      //   console.log("after 5s");
-      // }, 5000)
-      try{
-        
+    console.log("Before loadbodypix()");
+    loadBodyPix();
+    try{
+      var blurbgStream = canvas.captureStream();
+      blurBg.srcObject=blurbgStream;
+      console.log("blurBg " + blurBg.srcObject);
+      let videoTrack=blurBg.captureStream().getVideoTracks()[0];
 
-        //ddddddddddd
-        var blurbgStream = canvas.captureStream();
-        blurBg.srcObject=blurbgStream;
-        console.log("blurBg " + blurBg.srcObject);
-        let videoTrack=blurBg.captureStream().getVideoTracks()[0];
-
-        if(!blurbgStream){
-          console.log("stream null");
-        }
-        console.log("currentPeer "+currentPeer);
-        console.log("canvas stream "+blurbgStream);
-  
-        var sender=currentPeer.getSenders().find(function(s){
-          console.log(s);
-          console.log(blurbgStream);
-          if(s.track.kind==videoTrack.kind)
-              console.log("match found");
-          return s.track.kind==videoTrack.kind;
-        })
-        if(sender) {
-            // sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
-            sender.replaceTrack(videoTrack)
-            // videoTrack.onended=function(){
-            //   sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-            // }
-        }
-        //dddddddddddddddd
-        // sender.replaceTrack(window.localstream[0], blurbgStream, window.localstream);
-        console.log("After loadbodypix()");
+      if(!blurbgStream){
+        console.log("stream null");
       }
-      catch(err){
-        console.log("BODYPIX...");
-  
-        console.log(err.message);
-      }
-      //ddddddddddd
-      // var blurbgStream = canvas.captureStream(25);
-      // // document.getElementById('blur').srcObject=blurbgStream;
-      // if(!blurbgStream){
-      //   console.log("stream null");
-      // }
-      // console.log("currentPeer "+currentPeer);
-      // console.log("canvas stream "+blurbgStream);
+      console.log("currentPeer "+currentPeer);
+      console.log("canvas stream "+blurbgStream);
 
-      // var sender=currentPeer.getSenders().find(function(s){
-      //   console.log(s);
-      //   console.log(blurbgStream);
-      //   if(s.track.kind=="video")
-      //       console.log("match found");
-      //   return true;
-      // })
-      // if(sender) {
-      //     sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
-      //     blurbgStream.onended=function(){
-      //       sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-      //     }
-      // }
-      // //dddddddddddddddd
-      // // sender.replaceTrack(window.localstream[0], blurbgStream, window.localstream);
-      // console.log("After loadbodypix()");
-    // }
-    // catch(err) {
-    //   console.log("BODYPIX...");
-
-    //   console.log(err.message);
-    // }
-    
-  });
-  // lVideo.onplaying = () => {
-  //   canvas.height = lVideo.videoHeight;
-  //   canvas.width = lVideo.videoWidth;
-  // };
-
-  unblurBtn.addEventListener('click', e => {
-    // peer.replaceTrack(stream[0], videoElement.srcObject, stream)
-    blurBtn.hidden = false;
-    unblurBtn.hidden = true;
-  
-    lVideo.hidden = false;
-    canvas.hidden = true;
-    let videoTrack=window.localstream.getVideoTracks()[0];
-    var sender=currentPeer.getSenders().find(function(s){
-      // console.log(s);
-      // console.log(blurbgStream);
-      if(s.track.kind==videoTrack.kind)
-          console.log("match found");
-      return s.track.kind==videoTrack.kind;
-    })
-    if(sender) {
-      // sender.replaceTrack(blurbgStream.getVideoTracks()[0]);
-      sender.replaceTrack(videoTrack)
-      // videoTrack.onended=function(){
-      //   sender.replaceTrack(window.localstream.getVideoTracks()[0]);
-      // }
-    }
-  });
-
-  function loadBodyPix() {
-    var options = {
-      multiplier: 0.75,
-      stride: 32,
-      quantBytes: 4
-    }
-    
-    bodyPix.load(options)
-      .then(net => perform(net))
-      .catch(err => {
-          console.log("inside bodypix.load");
-        console.log(err);
+      var sender=currentPeer.getSenders().find(function(s){
+        console.log(s);
+        console.log(blurbgStream);
+        if(s.track.kind==videoTrack.kind)
+            console.log("match found");
+        return s.track.kind==videoTrack.kind;
       })
-
-    //   bodyPix.load({
-    //     architecture: 'MobileNetV1',
-    //     outputStride: 16,
-    //     multiplier: 0.75,
-    //     quantBytes: 2
-    // })
-  //   net.segmentPerson(webcamElement,  {
-  //     flipHorizontal: true,
-  //     internalResolution: 'medium',
-  //     segmentationThreshold: 0.5
-  //   })
-  //   .then(personSegmentation => {
-  //     if(personSegmentation!=null){
-  //         drawBody(personSegmentation);
-  //     }
-  // });
-  // cameraFrame = requestAnimFrame(detectBody);
-
-  }
-  
-  async function perform(net) {
-    // var outputStride = 16;
-    // var segmentationThreshold = 0.5;
-  
-    while (blurBtn.hidden) {
-      // const segmentation = await net.segmentPerson(video);
-      const segmentation = await net.segmentPerson(lVideo);
-      // const segmentation = await net.segmentPerson(videoElement);
-      // const segmentation = await net.estimatePersonSegmentation(videoElement, outputStride, segmentationThreshold)
-  
-      const backgroundBlurAmount = 6;
-      const edgeBlurAmount = 2;
-      const flipHorizontal = false;
-  
-      bodyPix.drawBokehEffect(
-        canvas, lVideo, segmentation, backgroundBlurAmount,
-        edgeBlurAmount, flipHorizontal);
+      if(sender) {
+          sender.replaceTrack(videoTrack)
+      }
+      console.log("After loadbodypix()");
     }
-  }
+    catch(err){
+      console.log("BODYPIX...");
 
+      console.log(err.message);
+    } 
+});
+
+unblurBtn.addEventListener('click', e => {
+  blurBtn.hidden = false;
+  unblurBtn.hidden = true;
+
+  lVideo.hidden = false;
+  canvas.hidden = true;
+  let videoTrack=window.localstream.getVideoTracks()[0];
+  var sender=currentPeer.getSenders().find(function(s){
+    if(s.track.kind==videoTrack.kind)
+      console.log("match found");
+    return s.track.kind==videoTrack.kind;
+  })
+  if(sender) {
+    sender.replaceTrack(videoTrack);
+  }
+});
+
+function loadBodyPix() {
+  var options = {
+    multiplier: 0.75,
+    stride: 32,
+    quantBytes: 4
+  }
+  
+  bodyPix.load(options)
+    .then(net => perform(net))
+    .catch(err => {
+      console.log("inside bodypix.load");
+      console.log(err);
+    })
+}
+  
+async function perform(net) {
+  while (blurBtn.hidden) {
+    const segmentation = await net.segmentPerson(lVideo);
+    const backgroundBlurAmount = 6;
+    const edgeBlurAmount = 2;
+    const flipHorizontal = false;
+
+    bodyPix.drawBokehEffect(
+      canvas, lVideo, segmentation, backgroundBlurAmount,
+      edgeBlurAmount, flipHorizontal);
+  }
+}
 
 //record screen
-//.........
-// async function streamToRecord(){
-//   // const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
-//   const constraints = {
-//     // audio: {
-//     //   echoCancellation: {exact: hasEchoCancellation}
-//     // },
-//     // video: true,
-//     video: true,
-//     audio: true
-//   //   {
-//   //     mediaSource: "window",
-//   //     width: 1280, 
-//   //     height: 720
-//   //   }
-//   };
-//   console.log('Using media constraints:', constraints);
-//   await init(constraints);
-// }
 async function init(constraints) {
   try {
     const recordStream = await navigator.mediaDevices.getDisplayMedia(constraints);
     handleSuccess(recordStream);
   } catch (e) {
     console.error('navigator.getUserMedia error:', e);
-  //   errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
   }
 }
 
@@ -566,27 +345,12 @@ getScreenStream.addEventListener('click', ()=>{
   getTheStream();
 })
 recordButton.addEventListener('click', () => {
-  // if (recordButton.value === 'start recording') {
-    // recordButton.value="stop recording";
-    // recordButton.innerHTML = 'stop recording';
-
-    // streamToRecord();
     console.log("record btn clicked");
     startRecording();
-  // } else {
-  //   recordButton.value = 'start recording';
-  //   recordButton.innerHTML="start recording";
-  //   stopRecording();
-    
-    // playButton.disabled = false;
-    // downloadButton.disabled = false;
-  // }
 });
 
 playButton.addEventListener('click', () => {
   const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
-  // recordedVideo.src = null;
-  // recordedVideo.srcObject = null;
   recordedVideo.src = window.URL.createObjectURL(superBuffer);
   recordedVideo.controls = true;
   recordedVideo.play();
@@ -619,33 +383,17 @@ function startRecording() {
   recordedBlobs = [];
   let options = {mimeType: 'video/webm;codecs=vp9,opus'};
   try {
-    // setTimeout(()=>{
-    //   mediaRecorder = new MediaRecorder(window.stream, options);
-    // }, 4000);
-    // console.log("now get media recorder");
     mediaRecorder = new MediaRecorder(window.stream, options);
   } catch (e) {
     console.error('Exception while creating MediaRecorder:', e);
-    // errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
     return;
   }
 
   console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
-  // recordButton.value = 'Stop Recording';
-  // recordButton.innerHTML = 'Stop Recording';
   playButton.disabled = true;
   downloadButton.disabled = true;
-  // mediaRecorder.onstop = (event) => {
-  //   console.log('Recorder stopped: ', event);
-  //   console.log('Recorded Blobs: ', recordedBlobs);
-
-  //   playButton.disabled = false;
-  //   downloadButton.disabled = false;
-  // };
-  // mediaRecorder.ondataavailable = handleDataAvailable;
   mediaRecorder.start();
-    mediaRecorder.ondataavailable = handleDataAvailable;
-
+  mediaRecorder.ondataavailable = handleDataAvailable;
   console.log('MediaRecorder started', mediaRecorder);
   mediaRecorder.onstop = (event) => {
     console.log('Recorder stopped: ', event);
@@ -657,141 +405,10 @@ function startRecording() {
 }
 
 function stopRecording() {
-  // if(!mediaRecorder) {
-  //   return console.error("No mediaRecorder found");
-  // }
   mediaRecorder.stop();
 }
 
-// stopRecordingButton.addEventListener('click',()=>{
-//   stopRecording();
-// })
 function handleSuccess(stream) {
-  // recordButton.disabled = false;
   console.log('getUserMedia() got stream:', stream);
   window.stream = stream;
-
-  // const gumVideo = document.querySelector('video#gum');
-  // gumVideo.srcObject = stream;
 }
-
-
-//.........
-
-
-// async function streamToRecord(){
-//     // const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
-//     const constraints = {
-//       // audio: {
-//       //   echoCancellation: {exact: hasEchoCancellation}
-//       // },
-//       video: true,
-//       audio: true
-//     //   {
-//     //     mediaSource: "window",
-//     //     width: 1280, 
-//     //     height: 720
-//     //   }
-//     };
-//     console.log('Using media constraints:', constraints);
-//     await init(constraints);
-//   }
-
-//   recordButton.addEventListener('click', () => {
-//     if (recordButton.value === 'start recording') {
-//       recordButton.value="stop recording";
-//       recordButton.innerHTML = 'stop recording';
-//       streamToRecord();
-//       startRecording();
-//     } else {
-//       recordButton.value = 'start recording';
-//       recordButton.innerHTML="start recording";
-//       stopRecording();
-      
-//       playButton.disabled = false;
-//       downloadButton.disabled = false;
-//     }
-//   });
-  
-//   playButton.addEventListener('click', () => {
-//     const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
-//     recordedVideo.src = null;
-//     recordedVideo.srcObject = null;
-//     recordedVideo.src = window.URL.createObjectURL(superBuffer);
-//     recordedVideo.controls = true;
-//     recordedVideo.play();
-//   });
-  
-  
-//   downloadButton.addEventListener('click', () => {
-//     const blob = new Blob(recordedBlobs, {type: 'video/mp4'});
-//     const url = window.URL.createObjectURL(blob);
-//     const a = document.createElement('a');
-//     a.style.display = 'none';
-//     a.href = url;
-//     a.download = 'test.mp4';
-//     document.body.appendChild(a);
-//     a.click();
-//     setTimeout(() => {
-//       document.body.removeChild(a);
-//       window.URL.revokeObjectURL(url);
-//     }, 100);
-//   });
-  
-//   function handleDataAvailable(event) {
-//     console.log('handleDataAvailable', event);
-//     if (event.data && event.data.size > 0) {
-//       recordedBlobs.push(event.data);
-//     }
-//   }
-  
-//   function startRecording() {
-//     recordedBlobs = [];
-//     let options = {mimeType: 'video/webm;codecs=vp9,opus'};
-//     try {
-//       mediaRecorder = new MediaRecorder(window.stream, options);
-//     } catch (e) {
-//       console.error('Exception while creating MediaRecorder:', e);
-//       // errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
-//       return;
-//     }
-  
-//     console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
-//     // recordButton.value = 'Stop Recording';
-//     // recordButton.innerHTML = 'Stop Recording';
-//     playButton.disabled = true;
-//     downloadButton.disabled = true;
-//     mediaRecorder.onstop = (event) => {
-//       console.log('Recorder stopped: ', event);
-//       console.log('Recorded Blobs: ', recordedBlobs);
-//     };
-//     mediaRecorder.ondataavailable = handleDataAvailable;
-//     mediaRecorder.start();
-//     console.log('MediaRecorder started', mediaRecorder);
-//   }
-  
-//   function stopRecording() {
-//     // if(!mediaRecorder) {
-//     //   return console.error("No mediaRecorder found");
-//     // }
-//     mediaRecorder.stop();
-//   }
-  
-//   function handleSuccess(stream) {
-//     // recordButton.disabled = false;
-//     console.log('getUserMedia() got stream:', stream);
-//     window.stream = stream;
-  
-//     // const gumVideo = document.querySelector('video#gum');
-//     // gumVideo.srcObject = stream;
-//   }
-  
-//   async function init(constraints) {
-//     try {
-//       const recordStream = await navigator.mediaDevices.getDisplayMedia(constraints);
-//       handleSuccess(recordStream);
-//     } catch (e) {
-//       console.error('navigator.getUserMedia error:', e);
-//     //   errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
-//     }
-//   }

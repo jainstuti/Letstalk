@@ -3,14 +3,18 @@
   <head>
     <!-- bootstrap -->
     <!-- CSS only -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-<!-- fontawesome -->
-<script src="https://kit.fontawesome.com/c939d0e917.js"></script>
-<link rel="stylesheet" href="/style.css">
-<!-- for body pix -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <!-- fontawesome -->
+    <script src="https://kit.fontawesome.com/c939d0e917.js"></script>
+    <link rel="stylesheet" href="/style.css" />
+    <!-- for body pix -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/body-pix@2.0"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs/dist/tf.min.js"> </script> -->
 
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -20,112 +24,127 @@
   <body>
     <h1 class="h3 mb-3 header fw-normal">Let's talk</h1>
     <div id="text_area">
-    <div id="chat-window">
-      <div id="output"></div>
-      <div id="typing"></div>
+      <div id="chat-window">
+        <div id="output"></div>
+        <div id="typing"></div>
+      </div>
+
+      <form>
+        <div class="form-floating">
+          <input
+            type="text"
+            class="form-control"
+            autocomplete="off"
+            id="handle"
+            placeholder="name"
+            required
+          />
+        </div>
+        <div class="form-floating">
+          <input
+            type="text"
+            class="form-control"
+            autocomplete="off"
+            id="message"
+            placeholder="enter message"
+          />
+        </div>
+
+        <button id="button" class="btn btn-lg btn-primary" type="submit">
+          send
+        </button>
+      </form>
     </div>
-
-    <form>
-      <div class="form-floating">
-        <input
-          type="text"
-          class="form-control"
-          id="handle"
-          placeholder="name"
-          required
-        />
-      </div>
-      <div class="form-floating">
-        <input
-          type="text"
-          class="form-control"
-          id="message"
-          placeholder="enter message"
-        />
-        
-      </div>
-
-      <button id="button" class=" btn btn-lg btn-primary" type="submit">
-        send
-      </button> 
-      
-    </form>
-  </div>
-    <hr>
+    <hr />
 
     <div class="container">
-        <div class="row">
-          <div class="col-sm-6 col-md-6 col-lg-8">
-              remote
-            <video id="rVideo" autoplay></video>
-          </div>
-          <div class="col-sm-6 col-md-6 col-lg-4">
-              local
-            <video width= "400px" height= "400px" id="lVideo" autoplay></video>
-            <canvas hidden id="canvas"></canvas>
-            <video autoplay hidden id="blurBg"></video>
-          </div>
+      <div class="row">
+        <div class="col">
+          remote
+          <video id="rVideo" autoplay></video>
         </div>
-        <span id="displayId"></span>
-        <input
-          type="text"
-          class="form-control"
-          id="connId"
-          placeholder="enter an ID"
-        />
-        <button id="conn_button" class="w-100 btn btn-lg btn-success" type="submit">
-            connect
-          </button>
-          <button id="call_button" class="w-100 btn btn-lg btn-danger" type="submit">
-            call
-          </button>
-          <button id="endCall" class=" btn btn-primary"><i class="fas fa-phone-slash"></i></button>
-          <button id="muteCamera" class="btn btn-primary"><i class="fas fa-video"></i></button>
-          <button id="muteAudio" class="btn btn-primary"><i class="fas fa-microphone"></i></button>
-          <button id="shareScreen" class="btn btn-primary">share screen</button>
-          <!-- <video id="sharedScreen"></video>  -->
-
-          <button id="blur-btn" type="button" class="btn btn-primary" disabled>
-            Blur background
-          </button>
-          <button id="unblur-btn" type="button" class="btn btn-primary" hidden>
-            Unblur
-          </button>
-          <!-- options for recording -->
-
-          <!-- <video id="gum" playsinline autoplay muted></video> -->
-          <br>
-          <br>
-          <button class="btn btn-primary" id="getScreenStream" >get the stream for recording</button>
-
-          <button class="btn btn-primary" id="recordScreen" value="start recording">start recording</button>
-          <!-- <button class="btn btn-primary" id="stopRecordingS" value="stop recording">stop recording</button> -->
-          <div>
-            <button class="btn btn-primary" id="play" disabled>Play</button>
-            <button class="btn btn-primary" id="download" disabled>Download</button>
-          </div>
-          <p>Preview</p>
-          <video id="recorded" playsinline></video>
-
-          <!-- <div>
-            <h4>Media Stream Constraints options</h4>
-            <p>
-              Echo cancellation: <input type="checkbox" id="echoCancellation" />
-            </p>
-          </div> -->
-
-          <!-- <div>
-            <span id="errorMsg"></span>
-          </div> -->
+        <div class="col">
+          local
+          <video width="400px" height="400px" id="lVideo" autoplay></video>
+          <canvas hidden id="canvas"></canvas>
+          <video autoplay hidden id="blurBg"></video>
+        </div>
       </div>
+      <!-- <div> -->
+      <span id="displayId"></span>
+      <input
+        type="text"
+        class="form-control"
+        id="connId"
+        placeholder="enter an ID"
+      />
+      <button
+        id="conn_button"
+        class="w-100 btn btn-lg btn-success"
+        type="submit"
+      >
+        connect
+      </button>
+      <button
+        id="call_button"
+        class="w-100 btn btn-lg btn-danger"
+        type="submit"
+      >
+        call
+      </button>
+      <!-- <br> -->
+    <!-- </div> -->
+      <button id="endCall" class="btn btn-primary">
+        <i class="fas fa-phone-slash"></i>
+      </button>
+      <button id="muteCamera" class="btn btn-primary">
+        <i class="fas fa-video"></i>
+      </button>
+      <button id="muteAudio" class="btn btn-primary">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <button id="shareScreen" class="btn btn-primary">share screen</button>
 
+      <button id="blur-btn" type="button" class="btn btn-primary" disabled>
+        Blur background
+      </button>
+      <button id="unblur-btn" type="button" class="btn btn-primary" hidden>
+        Unblur
+      </button>
+
+      <!-- options for recording -->
+      <br />
+      <br />
+      <hr />
+      <h6>
+        Hit
+        <span id="instructions" 
+          >Get the stream for recording</span
+        >
+        button followed by
+        <span id="instructions"
+          >Start recording</span
+        >
+        to record the screen
+      </h6>
+      <button class="btn btn-primary" id="getScreenStream">
+        Get the stream for recording
+      </button>
+
+      <button class="btn btn-primary" id="recordScreen" value="start recording">
+        Start recording
+      </button>
+      <div>
+        <br />
+        <button class="btn btn-primary" id="play" disabled>Play</button>
+        <button class="btn btn-primary" id="download" disabled>Download</button>
+      </div>
+      <p>Preview</p>
+      <video id="recorded" playsinline></video>
+    </div>
 
     <script src="/socket.io/socket.io.js"></script>
-    
-    <!-- <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>  -->
-
     <script src="https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js"></script>
     <script src="/client.js" type="module" async defer></script>
-    
   </body>
 </html>
