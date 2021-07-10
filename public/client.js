@@ -67,6 +67,7 @@ const blurBg=document.getElementById('blurBg' )
 const recordedVideo = document.querySelector('video#recorded');
 const playButton = document.querySelector('button#play');
 const downloadButton = document.querySelector('button#download');
+const getScreenStream=document.getElementById('getScreenStream');
 // tf.setBackend('cpu')
 let mediaRecorder;
 let recordedBlobs;
@@ -206,6 +207,8 @@ endCallButton.addEventListener('click', function (){
 muteCameraButton.addEventListener('click', ()=>{
     var vidTrack = window.localstream.getVideoTracks();
     vidTrack.forEach(track => track.enabled = !track.enabled);
+    muteCameraButton.innerHTML=muteCameraButton.innerHTML===('<i class="fas fa-video-slash" aria-hidden="true"></i>' || '<i class="fas fa-video-slash"></i>')? '<i class="fas fa-video" aria-hidden="true"></i>' : '<i class="fas fa-video-slash" aria-hidden="true"></i>';
+
     unblurBtn.disabled = !unblurBtn.disabled;
     blurBtn.disabled = !blurBtn.disabled;
 
@@ -521,116 +524,274 @@ blurBtn.addEventListener('click', e => {
 
 
 //record screen
+//.........
+// async function streamToRecord(){
+//   // const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
+//   const constraints = {
+//     // audio: {
+//     //   echoCancellation: {exact: hasEchoCancellation}
+//     // },
+//     // video: true,
+//     video: true,
+//     audio: true
+//   //   {
+//   //     mediaSource: "window",
+//   //     width: 1280, 
+//   //     height: 720
+//   //   }
+//   };
+//   console.log('Using media constraints:', constraints);
+//   await init(constraints);
+// }
+async function init(constraints) {
+  try {
+    const recordStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+    handleSuccess(recordStream);
+  } catch (e) {
+    console.error('navigator.getUserMedia error:', e);
+  //   errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
+  }
+}
 
-async function streamToRecord(){
-    // const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
-    const constraints = {
-      // audio: {
-      //   echoCancellation: {exact: hasEchoCancellation}
-      // },
-      video: true,
-      audio: true
-    //   {
-    //     mediaSource: "window",
-    //     width: 1280, 
-    //     height: 720
-    //   }
-    };
-    console.log('Using media constraints:', constraints);
-    await init(constraints);
+async function getTheStream(){
+  const constraints = {
+    video: true,
+    audio: true
+  };
+  console.log('Using media constraints:', constraints);
+  await init(constraints);
+}
+
+getScreenStream.addEventListener('click', ()=>{
+  getTheStream();
+})
+recordButton.addEventListener('click', () => {
+  // if (recordButton.value === 'start recording') {
+    // recordButton.value="stop recording";
+    // recordButton.innerHTML = 'stop recording';
+
+    // streamToRecord();
+    console.log("record btn clicked");
+    startRecording();
+  // } else {
+  //   recordButton.value = 'start recording';
+  //   recordButton.innerHTML="start recording";
+  //   stopRecording();
+    
+    // playButton.disabled = false;
+    // downloadButton.disabled = false;
+  // }
+});
+
+playButton.addEventListener('click', () => {
+  const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+  // recordedVideo.src = null;
+  // recordedVideo.srcObject = null;
+  recordedVideo.src = window.URL.createObjectURL(superBuffer);
+  recordedVideo.controls = true;
+  recordedVideo.play();
+});
+
+
+downloadButton.addEventListener('click', () => {
+  const blob = new Blob(recordedBlobs, {type: 'video/mp4'});
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'test.mp4';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }, 100);
+});
+
+function handleDataAvailable(event) {
+  console.log('handleDataAvailable', event);
+  if (event.data && event.data.size > 0) {
+    recordedBlobs.push(event.data);
+  }
+}
+
+function startRecording() {
+  recordedBlobs = [];
+  let options = {mimeType: 'video/webm;codecs=vp9,opus'};
+  try {
+    // setTimeout(()=>{
+    //   mediaRecorder = new MediaRecorder(window.stream, options);
+    // }, 4000);
+    // console.log("now get media recorder");
+    mediaRecorder = new MediaRecorder(window.stream, options);
+  } catch (e) {
+    console.error('Exception while creating MediaRecorder:', e);
+    // errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
+    return;
   }
 
-  recordButton.addEventListener('click', () => {
-    if (recordButton.value === 'start recording') {
-      streamToRecord();
-      startRecording();
-    } else {
-      stopRecording();
-      recordButton.value = 'start recording';
-      playButton.disabled = false;
-      downloadButton.disabled = false;
-    }
-  });
-  
-  playButton.addEventListener('click', () => {
-    const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
-    recordedVideo.src = null;
-    recordedVideo.srcObject = null;
-    recordedVideo.src = window.URL.createObjectURL(superBuffer);
-    recordedVideo.controls = true;
-    recordedVideo.play();
-  });
-  
-  
-  downloadButton.addEventListener('click', () => {
-    const blob = new Blob(recordedBlobs, {type: 'video/mp4'});
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.style.display = 'none';
-    a.href = url;
-    a.download = 'test.mp4';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-    }, 100);
-  });
-  
-  function handleDataAvailable(event) {
-    console.log('handleDataAvailable', event);
-    if (event.data && event.data.size > 0) {
-      recordedBlobs.push(event.data);
-    }
-  }
-  
-  function startRecording() {
-    recordedBlobs = [];
-    let options = {mimeType: 'video/webm;codecs=vp9,opus'};
-    try {
-      mediaRecorder = new MediaRecorder(window.stream, options);
-    } catch (e) {
-      console.error('Exception while creating MediaRecorder:', e);
-      errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
-      return;
-    }
-  
-    console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
-    recordButton.value = 'Stop Recording';
-    recordButton.innerHTML = 'Stop Recording';
-    playButton.disabled = true;
-    downloadButton.disabled = true;
-    mediaRecorder.onstop = (event) => {
-      console.log('Recorder stopped: ', event);
-      console.log('Recorded Blobs: ', recordedBlobs);
-    };
+  console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+  // recordButton.value = 'Stop Recording';
+  // recordButton.innerHTML = 'Stop Recording';
+  playButton.disabled = true;
+  downloadButton.disabled = true;
+  // mediaRecorder.onstop = (event) => {
+  //   console.log('Recorder stopped: ', event);
+  //   console.log('Recorded Blobs: ', recordedBlobs);
+
+  //   playButton.disabled = false;
+  //   downloadButton.disabled = false;
+  // };
+  // mediaRecorder.ondataavailable = handleDataAvailable;
+  mediaRecorder.start();
     mediaRecorder.ondataavailable = handleDataAvailable;
-    mediaRecorder.start();
-    console.log('MediaRecorder started', mediaRecorder);
-  }
+
+  console.log('MediaRecorder started', mediaRecorder);
+  mediaRecorder.onstop = (event) => {
+    console.log('Recorder stopped: ', event);
+    console.log('Recorded Blobs: ', recordedBlobs);
+
+    playButton.disabled = false;
+    downloadButton.disabled = false;
+  };
+}
+
+function stopRecording() {
+  // if(!mediaRecorder) {
+  //   return console.error("No mediaRecorder found");
+  // }
+  mediaRecorder.stop();
+}
+
+// stopRecordingButton.addEventListener('click',()=>{
+//   stopRecording();
+// })
+function handleSuccess(stream) {
+  // recordButton.disabled = false;
+  console.log('getUserMedia() got stream:', stream);
+  window.stream = stream;
+
+  // const gumVideo = document.querySelector('video#gum');
+  // gumVideo.srcObject = stream;
+}
+
+
+//.........
+
+
+// async function streamToRecord(){
+//     // const hasEchoCancellation = document.querySelector('#echoCancellation').checked;
+//     const constraints = {
+//       // audio: {
+//       //   echoCancellation: {exact: hasEchoCancellation}
+//       // },
+//       video: true,
+//       audio: true
+//     //   {
+//     //     mediaSource: "window",
+//     //     width: 1280, 
+//     //     height: 720
+//     //   }
+//     };
+//     console.log('Using media constraints:', constraints);
+//     await init(constraints);
+//   }
+
+//   recordButton.addEventListener('click', () => {
+//     if (recordButton.value === 'start recording') {
+//       recordButton.value="stop recording";
+//       recordButton.innerHTML = 'stop recording';
+//       streamToRecord();
+//       startRecording();
+//     } else {
+//       recordButton.value = 'start recording';
+//       recordButton.innerHTML="start recording";
+//       stopRecording();
+      
+//       playButton.disabled = false;
+//       downloadButton.disabled = false;
+//     }
+//   });
   
-  function stopRecording() {
-    // if(!mediaRecorder) {
-    //   return console.error("No mediaRecorder found");
-    // }
-    mediaRecorder.stop();
-  }
+//   playButton.addEventListener('click', () => {
+//     const superBuffer = new Blob(recordedBlobs, {type: 'video/webm'});
+//     recordedVideo.src = null;
+//     recordedVideo.srcObject = null;
+//     recordedVideo.src = window.URL.createObjectURL(superBuffer);
+//     recordedVideo.controls = true;
+//     recordedVideo.play();
+//   });
   
-  function handleSuccess(stream) {
-    recordButton.disabled = false;
-    console.log('getUserMedia() got stream:', stream);
-    window.stream = stream;
   
-    // const gumVideo = document.querySelector('video#gum');
-    // gumVideo.srcObject = stream;
-  }
+//   downloadButton.addEventListener('click', () => {
+//     const blob = new Blob(recordedBlobs, {type: 'video/mp4'});
+//     const url = window.URL.createObjectURL(blob);
+//     const a = document.createElement('a');
+//     a.style.display = 'none';
+//     a.href = url;
+//     a.download = 'test.mp4';
+//     document.body.appendChild(a);
+//     a.click();
+//     setTimeout(() => {
+//       document.body.removeChild(a);
+//       window.URL.revokeObjectURL(url);
+//     }, 100);
+//   });
   
-  async function init(constraints) {
-    try {
-      const recordStream = await navigator.mediaDevices.getDisplayMedia(constraints);
-      handleSuccess(recordStream);
-    } catch (e) {
-      console.error('navigator.getUserMedia error:', e);
-    //   errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
-    }
-  }
+//   function handleDataAvailable(event) {
+//     console.log('handleDataAvailable', event);
+//     if (event.data && event.data.size > 0) {
+//       recordedBlobs.push(event.data);
+//     }
+//   }
+  
+//   function startRecording() {
+//     recordedBlobs = [];
+//     let options = {mimeType: 'video/webm;codecs=vp9,opus'};
+//     try {
+//       mediaRecorder = new MediaRecorder(window.stream, options);
+//     } catch (e) {
+//       console.error('Exception while creating MediaRecorder:', e);
+//       // errorMsgElement.innerHTML = `Exception while creating MediaRecorder: ${JSON.stringify(e)}`;
+//       return;
+//     }
+  
+//     console.log('Created MediaRecorder', mediaRecorder, 'with options', options);
+//     // recordButton.value = 'Stop Recording';
+//     // recordButton.innerHTML = 'Stop Recording';
+//     playButton.disabled = true;
+//     downloadButton.disabled = true;
+//     mediaRecorder.onstop = (event) => {
+//       console.log('Recorder stopped: ', event);
+//       console.log('Recorded Blobs: ', recordedBlobs);
+//     };
+//     mediaRecorder.ondataavailable = handleDataAvailable;
+//     mediaRecorder.start();
+//     console.log('MediaRecorder started', mediaRecorder);
+//   }
+  
+//   function stopRecording() {
+//     // if(!mediaRecorder) {
+//     //   return console.error("No mediaRecorder found");
+//     // }
+//     mediaRecorder.stop();
+//   }
+  
+//   function handleSuccess(stream) {
+//     // recordButton.disabled = false;
+//     console.log('getUserMedia() got stream:', stream);
+//     window.stream = stream;
+  
+//     // const gumVideo = document.querySelector('video#gum');
+//     // gumVideo.srcObject = stream;
+//   }
+  
+//   async function init(constraints) {
+//     try {
+//       const recordStream = await navigator.mediaDevices.getDisplayMedia(constraints);
+//       handleSuccess(recordStream);
+//     } catch (e) {
+//       console.error('navigator.getUserMedia error:', e);
+//     //   errorMsgElement.innerHTML = `navigator.getUserMedia error:${e.toString()}`;
+//     }
+//   }
