@@ -1,5 +1,5 @@
 # Let's Talk
-A video conferencing web app built using webRTC, peerJS, socket.io, nodeJS, HTML, CSS and bootstrap
+A video conferencing web app built using webRTC, peerJS, socket.io, nodeJS, expressJS, bodypix model of tensorflow, HTML, CSS and bootstrap.
 This webapp supports video call between two peers and text chat among multiple peers.
 
 In this app, we can do the following:
@@ -10,3 +10,5 @@ In this app, we can do the following:
 5. Record the meeting/screen and can play as well as download it
 6. Disconnect from the video call without disconnecting from the text chatting
 7. Text chat could be started before the video call begins, persists during the video call and constinues after the call is ended
+
+I built it using the agile methodology of first delivering the minimum viable product and then improving and adding more features and fixing bugs, if any.
