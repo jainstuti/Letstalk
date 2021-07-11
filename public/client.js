@@ -95,9 +95,9 @@ var peer=new Peer();
 //display local id on DOM
 peer.on('open', function(){
     document.getElementById('displayId').innerHTML=peer.id;
-    conn.on('data', function(data) {
-        console.log('Received', data);
-      });
+    // conn.on('data', function(data) {
+    //     console.log('Received', data);
+    //   });
 })
 
 peer.on('connection', function(connection){
@@ -161,7 +161,7 @@ callButton.addEventListener('click', function(){
 
 //end call
 endCallButton.addEventListener('click', function (){
-    conn.close();
+    // conn.close();
     peer.destroy();
 })
 
