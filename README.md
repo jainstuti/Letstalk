@@ -1,4 +1,4 @@
-# Letstalk
+# Let's Talk
 A video conferencing web app built using webRTC, peerJS, socket.io, nodeJS, HTML, CSS and bootstrap
 This webapp supports video call between two peers and text chat among multiple peers.
 
